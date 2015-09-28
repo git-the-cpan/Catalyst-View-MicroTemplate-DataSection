@@ -4,7 +4,7 @@ use Encode;
 use Text::MicroTemplate::DataSection;
 use namespace::autoclean;
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 extends 'Catalyst::View';
 with 'Catalyst::Component::ApplicationAttribute';
@@ -21,25 +21,19 @@ has context => (
 );
 
 has content_type => (
-    is      => 'ro',
+    is      => 'rw',
     isa     => 'Str',
-    default => 'text/html'
+    lazy_build => 1,
 );
 
 has charset => (
     is      => 'rw',
     isa     => 'Str',
-    default => 'UTF-8'
-);
-
-has encode_body => (
-    is      => 'rw',
-    isa     => 'Bool',
-    default => 1,
+    default => 'UTF-8',
 );
 
 has template_extension => (
-    is      => 'ro',
+    is      => 'rw',
     isa     => 'Str',
     default => '.mt',
 );
@@ -62,6 +56,11 @@ sub _build_section {
     return $self->context->action->class;
 }
 
+sub _build_content_type {
+    my ($self) = @_;
+    return $self->context->res->content_type;
+}
+
 sub _build_engine {
     my ($self) = @_;
     return Text::MicroTemplate::DataSection->new(package => $self->section);
@@ -78,21 +77,13 @@ sub process {
     my $template = $c->stash->{template} || $c->action->name;
     my $body     = $self->render($c, $template);
 
-    if (! $c->res->content_type) {
-        $c->res->content_type($self->content_type.'; charset=' . $self->charset);
-    }   
+    $c->res->content_type($self->content_type.'; charset=' . $self->charset);
+
     if (blessed $body && $body->can('as_string')) {
         $body = $body->as_string;
     }   
-    $c->res->body($body);
 
-    # not implemented yet ...
-    #if ( $self->encode_body ) { 
-    #    $res->body(encode($self->charset, $body));
-    #}   
-    #else {
-    #    $res->body( $body );
-    #}   
+    $c->res->body( $body );
 }
 
 __PACKAGE__->meta->make_immutable();
@@ -133,6 +124,44 @@ Catalyst::View::MicroTemplate::DataSection - Text::MicroTemplate::DataSection Vi
 =head1 DESCRIPTION
 
 Catalyst::View::MicroTemplate::DataSection is simple wrapper module allows you to render MicroTemplate template from __DATA__ section in Catalyst controller.
+
+=head2 One file .psgi example
+
+plackup -a hello.psgi
+
+    package Hello::View::MicroTemplate::DataSection {
+        use Moose; extends 'Catalyst::View::MicroTemplate::DataSection';
+        sub _build_section { 'main' }
+    };
+
+    package Hello::Controller::Root {
+        use Moose; BEGIN { extends 'Catalyst::Controller' }
+        __PACKAGE__->config(namespace => '');
+
+        sub index :Path :Args(0) {
+            my ($self, $c) = @_; 
+            $c->stash->{okinawa} = "Yomitan perl mongers";
+        }   
+
+        sub end : ActionClass('RenderView') {}
+    };
+
+    package Hello 0.01 {
+        use Moose;
+        use Catalyst::Runtime 5.80;
+        extends 'Catalyst';
+        __PACKAGE__->setup();
+    };
+
+    package main;
+    Hello->psgi_app;
+
+    __DATA__
+
+    @@ index.mt
+    ? my $stash = shift;
+    <?= $stash->{okinawa} ?>
+
 
 =head1 SEE ALSO
 

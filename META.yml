@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.142060'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,15 +26,16 @@ no_index:
 provides:
   Catalyst::View::MicroTemplate::DataSection:
     file: lib/Catalyst/View/MicroTemplate/DataSection.pm
-    version: '0.02'
+    version: '0.03'
 requires:
+  Catalyst::Devel: '0'
+  Catalyst::Runtime: '0'
   Text::MicroTemplate::DataSection: '0'
 resources:
   bugtracker: https://github.com/masakyst/Catalyst-View-MicroTemplate-DataSection/issues
   homepage: https://github.com/masakyst/Catalyst-View-MicroTemplate-DataSection
   repository: git://github.com/masakyst/Catalyst-View-MicroTemplate-DataSection.git
-version: '0.02'
+version: '0.03'
 x_authority: cpan:MASAKYST
 x_contributors:
   - 'Masaaki Saito <masakyst.mobile@gmail.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

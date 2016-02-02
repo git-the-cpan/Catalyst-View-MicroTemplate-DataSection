@@ -81,4 +81,4 @@ it under the same terms as Perl itself.
 
 # AUTHOR
 
-Masaaki Saito &lt;masakyst.public@gmail.com>
+Masaaki Saito <masakyst.public@gmail.com>
